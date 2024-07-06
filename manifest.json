@@ -1,0 +1,21 @@
+{
+  "manifest_version": 2,
+  "name": "CraigslistRepostTrimmer",
+  "version": "1.0",
+
+  "description": "Removes reposts from craigslist.",
+
+  "icons": {
+    "48": "icons/view_cozy.png"
+  },
+
+  "permissions": ["activeTab"],
+
+  "content_scripts": [
+    {
+      "matches": ["*://*.craigslist.org/*"],
+      "js": ["TrimReposts.js"],
+      "run_at": "document_end"
+    }
+  ]
+}
