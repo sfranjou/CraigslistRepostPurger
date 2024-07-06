@@ -56,7 +56,7 @@ function CheckIfRepost(galleryCardElement, postDatabase)
         // we've found it in the database: make it invisible if the date is different
         if (postDate !== retrievedPost.date)
         {
-            console.log("Found the same post with a different date: repost spotted. OBLITERAT ", postKey);
+            console.log("Repost removed: ", postKey);
             makeItemInvisible(galleryCardElement);
         }
         else
@@ -70,19 +70,9 @@ function CheckIfRepost(galleryCardElement, postDatabase)
 
 async function hideReposts()
 {
-    /**
-     * Check and set a global guard variable.
-     * If this content script is injected into the same page again,
-     * it will do nothing next time.
-     */
-    // if (window.hasRun)
-    // {
-    //     return;
-    // }
-    // window.hasRun = true;
-
-
     // load the database
+    // TODO: only load it once, since we now reload it every time we navigate
+    console.log("Hiding reposts...");
     let postDatabase = await browser.storage.local.get("postDatabase");
     postDatabase = postDatabase.postDatabase;
     if (postDatabase == undefined)
@@ -132,12 +122,60 @@ async function hideReposts()
 // TEMP: clear storage
 // browser.storage.local.clear();
 
-
-let pageLoadingTimeMs = 10000;
+let pageLoadingTimeMs = 250;
 
 // wait 1 second before running to let the page load
 setTimeout(hideReposts, pageLoadingTimeMs);
+// window.addEventListener("load", hideReposts);
+
+
+
+function listenToAllButtons()
+{
+    const buttons = document.querySelectorAll("button");
+    for (const button of buttons)
+    {
+        button.addEventListener("click", function ()
+        {
+            // Your code to handle the click event goes here
+            // console.log("A button was clicked!");
+            setTimeout(hideReposts, pageLoadingTimeMs);
+        });
+    }
+}
+
+// Call the function after the page loads to ensure buttons are available
+window.addEventListener("load", listenToAllButtons);
 
 
 // let's add listeners to the forward and back buttons to re-run this script
-// document.addEventListener("DOMContentLoaded", hideReposts);
+// TODO: this doens;t work, for some reason clickign on the buttons doesn;t trigger the event,
+// while clicking on other buttons does.
+
+// setTimeout(() =>
+// {
+//     // this queries for the container that contains the forward and back buttons
+//     let navigationButtonBoxes = document.getElementsByClassName("cl-search-paginator");
+//     // console.log(navigationButtonBoxes);
+//     for (let buttonBox of navigationButtonBoxes)
+//     {
+//         console.log(buttonBox);
+//         buttonBox.addEventListener('click', (event) =>
+//         {
+//             const isButton = event.target.nodeName === 'BUTTON';
+//             // if (!isButton)
+//             {
+//                 console.log("wrong item clicked i guess");
+//                 console.dir(event.target.nodeName);
+//                 return;
+//             }
+//             console.log("WE CLICKED THE BUTTTTOTOTNTOSNOTSN");
+//             setTimeout(hideReposts, pageLoadingTimeMs);
+//             console.dir(event.target.id);
+//         })
+//     };
+// },
+//     pageLoadingTimeMs
+// )
+
+
